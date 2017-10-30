@@ -26,6 +26,14 @@ switch (action) {
         // case "spotify-this-song"
         // 	spotifySearch();
         // 	break;
+
+        // case "movie-this";
+        // movieSearch();
+        // break;
+
+        // case "do-what-it-says";
+        // textSearch();
+        // break;
 }
 
 //Twitter
@@ -69,8 +77,6 @@ spotify.search({ type: 'track', query: 'all the small things' }, function(err, d
     console.log("-------------------------");
 });
 
-
-
 //Response/OMDB
 request("http://www.omdbapi.com/?t=remember+the+titans&y=&plot=short&apikey=40e9cece", function(error, response, body) {
 
@@ -91,4 +97,13 @@ request("http://www.omdbapi.com/?t=remember+the+titans&y=&plot=short&apikey=40e9
         console.log("-------------------------");
         // console.log(response);
     }
+});
+
+//readFile to read contents of random.txt file, then need to take that content for the searchSpotify function
+fs.readFile("random.txt", "utf8", function(error, data) {
+    if (error) {
+        return console.log(error);
+    }
+    console.log("Contents of random.txt file: " + data);
+    var dataArr = data.split(",");
 });

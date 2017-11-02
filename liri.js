@@ -5,21 +5,26 @@ var request = require("request");
 var fs = require("fs");
 var twitterKeysINeed = require("./keys.js");
 
+//*********************************
+//I didn't end up using the code below, but wanted to keep it for reference...
+//*********************************
 //code to grab the user-input title of either the "song" or "movie" from command line (index 3), which will be passed into search
-var nodeArgs = process.argv;
-var title = "";
-for (var i = 3; i < nodeArgs.length; i++) {
-    title = title + " " + nodeArgs[i];
-};
+// var nodeArgs = process.argv;
+// var title = "";
+// for (var i = 3; i < nodeArgs.length; i++) {
+//     title = title + " " + nodeArgs[i];
+// };
 // console log test to ensure the "title" was grabbed successfully
 // console.log("-------------------------");
 // console.log("This is either the song or movie title the user had input: " + title);
 // console.log("-------------------------");
+//*********************************
 
-//Switch statement to invoke functions based upon a specific command given for index 2 on command line
+//Switch statement to invoke functions, taking user input from command line, index 2 & 3: 
 var action = process.argv[2];
+var title = process.argv[3];
 
-function liriCommand(action, title) {
+function liriCommand(action) {
     switch (action) {
         case "my-tweets":
             myTweets();
@@ -33,12 +38,13 @@ function liriCommand(action, title) {
             movieSearch();
             break;
 
-        default:
-            console.log("Sorry not a recognized command.  Please enter a correct command.");
-
         case "do-what-it-says":
             textSearch();
             break;
+
+        default:
+            console.log("Sorry not a recognized command.  Please enter a correct command.");
+
     }
 
 }
@@ -69,14 +75,17 @@ function spotifySearch() {
         id: '5195314043b341fea99001c41b8533e8',
         secret: '467957e6ec6d451e963e4ba39c8846c4'
     });
-
+    //if no song title is given in command line, search for "The Sign"
+    if (!title) {
+        title = "The Sign";
+    }
     //Spotify "Search" method:
     spotify.search({ type: 'track', query: title }, function(err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
         }
         // **console.log(data);  //all data returned
-        // **console.log(data.tracks.items[0]); //opening up data to get needed info
+        // **console.log(data.tracks.items[0]); //this opened up the object for me to pull out the needed info
         console.log("-------------------------");
         console.log("Artist name: " + data.tracks.items[0].artists[0].name); //artist name
         console.log("Song name: " + data.tracks.items[0].name); //song name
@@ -89,10 +98,14 @@ function spotifySearch() {
 
 //Response/OMDB
 function movieSearch() {
+    //if no song movie is given in command line, search for "Mr Nobody"
+    if (!title) {
+        title = "Mr Nobody";
+    }
     request("http://www.omdbapi.com/?t=" + title + "&y=&plot=short&apikey=40e9cece", function(error, response, body) {
         if (!error && response.statusCode === 200) {
             // console.log("-------------------------");
-            console.log(JSON.parse(body));
+            // console.log(JSON.parse(body)); //this allowed me to open up the object to pull out the needed info
             console.log("-------------------------");
             console.log("Movie title: " + JSON.parse(body).Title);
             console.log("Year Released: " + JSON.parse(body).Released);
@@ -108,17 +121,19 @@ function movieSearch() {
 
 }
 
-//readFile to read contents of random.txt file, then need to take that content for the searchSpotify function
+//readFile to read contents of random.txt file and then pass the contents of that file into the searchSpotify function
 function textSearch() {
     fs.readFile("random.txt", "utf8", function(error, data) {
         if (error) {
             return console.log(error);
         }
-        console.log("Contents of random.txt file: " + data)
+        // console.log("-------------------------");
+        // console.log("Contents of random.txt file: " + data)
+        // console.log("-------------------------");
         var dataArr = data.split(",");
         action = dataArr[0];
         title = dataArr[1];
-        liriCommand(action, title);
+        liriCommand(action);
         return;
     });
 }
